@@ -45,7 +45,7 @@ Daftar monster yang diserang: nama monster, DMG, D%, DPS, Hits, dan **HP penuh**
 ### Otomatis / plug & play
 - Adapter jaringan dipilih otomatis dari koneksi game (langsung, ExitLag, VPN), dicek ulang terus — meter boleh dibuka sebelum atau sesudah game.
 - Folder game dicari otomatis (registry / lokasi umum), bisa dipilih manual.
-- Nama sendiri ke-detect otomatis dari data party; kalau belum, tampil sebagai "Kamu".
+- Nama sendiri ke-detect otomatis (dari hit kamu yang juga tersiar ke party); kalau belum, tampil sebagai "Kamu" — bisa diisi manual di Menu.
 - Kalau Npcap belum terpasang, muncul petunjuk + link download.
 
 ### Belum ada
@@ -84,21 +84,22 @@ Mode development (env var):
 | Folder | Isi |
 |---|---|
 | `src/DpsMeterUI` | overlay WPF (deliverable utama = `SealDpsMeter.exe`). `CaptureEngine.cs` = parser paket |
-| `src/DpsMeter` | versi console |
+| `src/DpsMeter` | versi console lama — **tidak di-update lagi** (belum ada roster party, job, target, dll). Semua fitur baru masuk ke `DpsMeterUI` |
 | `tools/PacketCapture` | rekam traffic game ke `.pcap` |
 | `tools/PacketAnalyze` | alat reverse-engineering (decode opcode, cari field) |
 | `tools/MemoryProbe` | bukti bahwa GameGuard memblokir `OpenProcess` (alasan pakai sniffing) |
-| `docs/` | catatan protokol: `capture-log.md`, `skills-log.md` — **baca ini dulu** sebelum ubah parser |
+| `docs/protocol.md` | format paket yang berlaku sekarang — **baca ini dulu** sebelum ubah parser |
+| `docs/research-log.md` | catatan riset kronologis (termasuk teori yang sudah dibatalkan) |
 
 ## Protokol (ringkas)
 
 - Paket server→client tidak terenkripsi; client→server terenkripsi (cuma header terbaca).
-- `0xCC5D` auto-attack sendiri, `0xCEA4` skill sendiri, `0xCC5E` / `0xCEA5` auto/skill pemain lain.
-- `0x041C` roster party (nama → entity ID, level, job). `0xCC1B` broadcast karakter di sekitar (nama, job, equip).
-- `0xCC35` entity list (entity → jenis monster).
+- `CC5D` / `F339` auto-attack sendiri, `CEA4` / `CEA6` / `F360` skill sendiri, `CC5E` / `F33C` / `CEA5` auto/skill pemain lain.
+- `041C` roster party (nama → entity ID, level, job). `CC1B` karakter di sekitar (nama, job, equip).
+- `CC35` / `CC36` entity monster (entity → jenis monster).
 - Entity ID **bukan** permanen per karakter — bisa ganti saat masuk dungeon / relog. UI menggabungkan per nama.
 
-Detail lengkap dan riwayat temuan ada di `docs/`.
+Layout lengkap per opcode: [docs/protocol.md](docs/protocol.md).
 
 ## Kontribusi
 

@@ -1,12 +1,22 @@
-# Log Skill & Damage (Vanbonang - Assassin)
+# Log Riset (kronologis)
 
-Dipakai untuk cross-reference field skill ID nanti setelah ketemu di paket.
+> **Ini catatan harian riset, bukan referensi.** Banyak kesimpulan awal di sini
+> kemudian **dibatalkan** oleh bagian "KOREKSI" di bawahnya. Untuk format paket
+> yang berlaku sekarang, baca [protocol.md](protocol.md). File ini disimpan untuk
+> konteks: kenapa suatu teori salah, dan data pembanding dari layar game.
+>
+> Nama file `.pcap` yang disebut di sini tidak ada di repo (berisi traffic akun).
+
+Damage yang tercatat dari layar game (patokan verifikasi):
 
 | Skill | Level | % | Damage tercatat | Tanggal |
 |---|---|---|---|---|
-| Soul Breaker | 18 | 3172% | 30.105.755 / 31.606.713 / ~30.37jt / ~30.40jt | 2026-09-25 |
-| Deathly Slash | 21 | 5003% | 48.825.908 / 50.265.372 / 50.349.032 (+ bleed ~20rb, field belum terverifikasi) | 2026-09-25 |
-| Sticky Bomb (PemainB/Demolitionist) | - | - | 439.212 | 2026-09-25 |
+| Soul Breaker (Assassin) | 18 | 3172% | 30.105.755 / 31.606.713 / ~30.37jt / ~30.40jt | 2026-09-25 |
+| Deathly Slash (Assassin) | 21 | 5003% | 48.825.908 / 50.265.372 / 50.349.032 (+ bleed ~20rb, field belum terverifikasi) | 2026-09-25 |
+| Sticky Bomb (Demolitionist) | - | - | 439.212 | 2026-09-25 |
+| Throw Bomb (Demolitionist) | - | - | ~300rb | 2026-09-25 |
+| Auto-attack Demolitionist | - | - | 12.229 | 2026-09-25 |
+| Auto-attack Assassin | - | - | 77.198 - 81.845 (kisaran) | 2026-09-25 |
 
 ## Update 2026-09-25: teori "skill ID" DIBATALKAN, attacker ID KETEMU
 
@@ -114,32 +124,11 @@ Buat nambah karakter baru: pakai skill apapun, capture, cari lewat
 `PacketAnalyze ... fields`, cocokkan F7 barunya, tambahkan ke dictionary
 `attackerNames` di `src/DpsMeter/Program.cs`.
 
-## Riset job ID (belum selesai, 1 data point pair)
+## Riset job ID lewat char-select (DITINGGALKAN)
 
-Field kandidat: di paket client->server saat KLIK PILIH KARAKTER di char-select
-(bukan pas sudah masuk map). Struktur: `[...account code...][nama
-karakter + padding null][field kandidat job, 4 byte][field lain...]`.
-
-| Karakter | Job | Field kandidat |
-|---|---|---|
-| Vanbonang | Assassin | 1 |
-| PemainB | Demolitionist | 3 |
-
-Baru 2 titik data, belum cukup buat pastiin pattern-nya (misal apakah select
-alfabetis/enum resmi). Perlu minimal 1-2 karakter job lain buat konfirmasi
-(rencana: Berserker, character punya user, belum sempat capture).
-
-Cara capture: mulai `PacketCapture`, LOGOUT dulu ke char-select, baru KLIK
-pilih karakter target (bukan auto masuk) - supaya paket request-nya kekirim
-dalam window capture.
-| Auto-attack (normal weapon) | - | - | 77.198 - 81.845 (kisaran) | 2026-09-25 |
-
-## Cara nambah skill baru
-1. Jalankan `dotnet run --project tools/PacketCapture/PacketCapture.csproj -- 30`
-2. Pakai 1 skill saja berulang kali selama capture jalan
-3. Catat nama skill + level + % di sini
-4. Analisa dengan `tools/PacketAnalyze` (mode `scan <min> <max>`) untuk cari field damage-nya
-5. Update tabel di atas
+Sempat dicari di paket client->server saat memilih karakter di char-select, tapi
+arah ini ditinggalkan: job ternyata ada di roster party `041C` dan broadcast
+`CC1B` (lihat bagian 2026-09-27 di bawah).
 
 ## KOREKSI 2026-09-26: SKILL ID KETEMU = F1 (+4 dari magic), F2 = entity ID sesi attacker
 
