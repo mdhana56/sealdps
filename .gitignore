@@ -18,3 +18,6 @@ __pycache__/
 
 # Setting lokal Claude Code / editor
 .claude/
+
+# Script lokal (repo cuma source; rilis = exe dari GitHub Actions)
+*.bat

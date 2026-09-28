@@ -1,0 +1,34 @@
+# Push tag v* (mis. v0.1.0) -> build SealDpsMeter.exe (single file, tanpa perlu
+# install .NET) dan lampirkan ke GitHub Release. User cukup download exe-nya.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish
+        run: >
+          dotnet publish src/DpsMeterUI/DpsMeterUI.csproj -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true -p:DebugType=none -o publish
+
+      - name: Rename
+        run: Move-Item publish/DpsMeterUI.exe SealDpsMeter.exe
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: SealDpsMeter.exe
+          generate_release_notes: true

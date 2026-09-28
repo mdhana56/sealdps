@@ -58,10 +58,13 @@ Jalan dengan koneksi langsung, ExitLag (loopback), maupun VPN — adapter dipili
 
 Butuh: Windows, [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0), Npcap.
 
-```bat
-run-dps-meter-ui.bat      :: build + jalankan overlay WPF (self-elevate ke admin)
-publish.bat               :: bikin dist\SealDpsMeter.exe (single file, self-contained)
 ```
+dotnet build src/DpsMeterUI/DpsMeterUI.csproj
+```
+
+Exe hasil build minta hak Administrator (dibutuhkan Npcap) — jalankan dari terminal/IDE yang di-"Run as administrator".
+
+**Rilis:** push tag `v*` (mis. `git tag v0.1.0 && git push origin v0.1.0`) → GitHub Actions otomatis build `SealDpsMeter.exe` (single file, tanpa perlu install .NET) dan melampirkannya di halaman Releases.
 
 Mode development (env var):
 
@@ -75,7 +78,7 @@ Mode development (env var):
 
 | Folder | Isi |
 |---|---|
-| `src/DpsMeterUI` | overlay WPF (deliverable utama). `CaptureEngine.cs` = parser paket |
+| `src/DpsMeterUI` | overlay WPF (deliverable utama = `SealDpsMeter.exe`). `CaptureEngine.cs` = parser paket |
 | `src/DpsMeter` | versi console |
 | `tools/PacketCapture` | rekam traffic game ke `.pcap` |
 | `tools/PacketAnalyze` | alat reverse-engineering (decode opcode, cari field) |
