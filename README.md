@@ -9,6 +9,15 @@ DPS meter overlay untuk **Seal Online** (gaya LOA Logs): damage, DPS, D%, jumlah
 >
 > **Hanya dites di server BOD.** Server/versi lain bisa punya format paket berbeda — damage, nama, atau job bisa salah atau tidak terbaca sama sekali.
 
+## Keamanan akun — meter ini TIDAK bisa mencuri akun
+
+- **Tidak membaca login / password.** Semua yang dikirim game ke server (termasuk login) terenkripsi dan tidak di-decode. Meter hanya membaca data pertempuran yang dikirim server ke game: damage, nama & job anggota party, monster, equip yang terlihat.
+- **Tidak mengirim data ke mana pun.** Tidak ada kode yang membuka koneksi internet atau meng-upload apa pun. Satu-satunya tautan adalah halaman download Npcap, yang dibuka di browser kalau Npcap belum terpasang.
+- **Tidak menyimpan traffic.** Paket dibaca langsung di memori lalu dibuang. File yang ditulis cuma pilihan folder game (`%AppData%\SealDpsMeter`).
+- **Cuma melihat koneksi game.** Filter capture dibatasi ke koneksi TCP milik proses Seal Online (web/HTTPS dikecualikan) — aktivitas lain di PC tidak ikut terbaca.
+- **Tidak menyentuh game.** Tidak inject, tidak baca/tulis memori, tidak mengirim paket.
+- **Source terbuka** — semua di atas bisa dicek sendiri di `src/DpsMeterUI/CaptureEngine.cs`. Download exe hanya dari halaman Releases repo ini.
+
 ## Fitur yang sudah jalan
 
 ### Tab DPS — tabel party
@@ -93,7 +102,7 @@ Mode development (env var):
 
 ## Protokol (ringkas)
 
-- Paket server→client tidak terenkripsi; client→server terenkripsi (cuma header terbaca).
+- Yang di-parse cuma pesan server→client (data pertempuran). Pesan client→server terenkripsi dan diabaikan.
 - `CC5D` / `F339` auto-attack sendiri, `CEA4` / `CEA6` / `F360` skill sendiri, `CC5E` / `F33C` / `CEA5` auto/skill pemain lain.
 - `041C` roster party (nama → entity ID, level, job). `CC1B` karakter di sekitar (nama, job, equip).
 - `CC35` / `CC36` entity monster (entity → jenis monster).

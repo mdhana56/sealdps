@@ -6,7 +6,7 @@ Referensi **terkini** untuk kontributor — isinya sama dengan yang dijalankan `
 
 ## Dasar
 
-- Cuma paket **server → client** yang dibaca. Paket client → server terenkripsi (cuma header yang terbaca).
+- Yang di-parse cuma pesan **server → client** (data pertempuran). Pesan client → server (termasuk login) terenkripsi dan tidak di-decode — meter tidak punya akses ke kredensial akun.
 - Semua angka **little-endian**; damage/HP = `uint32` mentah (tanpa skala).
 - Format pesan umum: `[uint32 len][uint16 opcode][07 00][isi...]`. Server sering membundel beberapa pesan dalam 1 segmen TCP, jadi parser **men-scan seluruh payload** mencari `?? ?? 07 00` lalu memvalidasi `len`.
 - Pesan besar (`CC35`, `CC1B`) sering terpotong ke beberapa segmen TCP → disambung pakai sequence number (`SplitMessage`).
