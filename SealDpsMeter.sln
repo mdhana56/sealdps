@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{FA649B0A-5AC7-4420-B763-96B7A83697DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryProbe", "tools\MemoryProbe\MemoryProbe.csproj", "{DA8EA975-AA00-4A6E-AF23-76410C254A39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacketCapture", "tools\PacketCapture\PacketCapture.csproj", "{F1B6D3F5-9234-4F5D-A70A-C629127A86D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacketAnalyze", "tools\PacketAnalyze\PacketAnalyze.csproj", "{38CBD1F6-8FD4-421D-8577-5A133503670C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{868EE93A-A65E-4A7A-BB1A-70B1ACA0541E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DpsMeter", "src\DpsMeter\DpsMeter.csproj", "{8AF6415F-DA0F-4055-84E7-B2B0AB4AE918}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DpsMeterUI", "src\DpsMeterUI\DpsMeterUI.csproj", "{1F6F97C5-C9FD-4551-842C-CA6D8F5CF577}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA8EA975-AA00-4A6E-AF23-76410C254A39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8EA975-AA00-4A6E-AF23-76410C254A39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8EA975-AA00-4A6E-AF23-76410C254A39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8EA975-AA00-4A6E-AF23-76410C254A39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1B6D3F5-9234-4F5D-A70A-C629127A86D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1B6D3F5-9234-4F5D-A70A-C629127A86D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1B6D3F5-9234-4F5D-A70A-C629127A86D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1B6D3F5-9234-4F5D-A70A-C629127A86D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38CBD1F6-8FD4-421D-8577-5A133503670C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38CBD1F6-8FD4-421D-8577-5A133503670C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38CBD1F6-8FD4-421D-8577-5A133503670C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38CBD1F6-8FD4-421D-8577-5A133503670C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AF6415F-DA0F-4055-84E7-B2B0AB4AE918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AF6415F-DA0F-4055-84E7-B2B0AB4AE918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AF6415F-DA0F-4055-84E7-B2B0AB4AE918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AF6415F-DA0F-4055-84E7-B2B0AB4AE918}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F6F97C5-C9FD-4551-842C-CA6D8F5CF577}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F6F97C5-C9FD-4551-842C-CA6D8F5CF577}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F6F97C5-C9FD-4551-842C-CA6D8F5CF577}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6F97C5-C9FD-4551-842C-CA6D8F5CF577}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DA8EA975-AA00-4A6E-AF23-76410C254A39} = {FA649B0A-5AC7-4420-B763-96B7A83697DC}
+		{F1B6D3F5-9234-4F5D-A70A-C629127A86D1} = {FA649B0A-5AC7-4420-B763-96B7A83697DC}
+		{38CBD1F6-8FD4-421D-8577-5A133503670C} = {FA649B0A-5AC7-4420-B763-96B7A83697DC}
+		{8AF6415F-DA0F-4055-84E7-B2B0AB4AE918} = {868EE93A-A65E-4A7A-BB1A-70B1ACA0541E}
+		{1F6F97C5-C9FD-4551-842C-CA6D8F5CF577} = {868EE93A-A65E-4A7A-BB1A-70B1ACA0541E}
+	EndGlobalSection
+EndGlobal

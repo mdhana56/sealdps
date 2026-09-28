@@ -1,0 +1,444 @@
+﻿<Window x:Class="DpsMeterUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DpsMeterUI"
+        Title="Seal Online DPS Meter" Icon="app.ico" Height="360" Width="520" MinHeight="120" MinWidth="320"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="CanResizeWithGrip" Topmost="True" Foreground="#E5E5E5">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <!-- Ikon job (gaya LOA Logs): badge bulat singkatan job, warna per rumpun, nama lengkap di tooltip -->
+        <DataTemplate x:Key="JobBadge">
+            <Border Width="18" Height="18" CornerRadius="9" Background="{Binding JobBrush}" VerticalAlignment="Center"
+                    ToolTip="{Binding Job}" Visibility="{Binding HasJob, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Path Data="{Binding JobIcon}" Fill="White" Stretch="Uniform" Margin="3.5"/>
+                    <TextBlock Text="{Binding JobAbbrev}" FontSize="8.5" FontWeight="Bold" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+        <GridLength x:Key="ColDmg">60</GridLength>
+        <GridLength x:Key="ColPct">46</GridLength>
+        <GridLength x:Key="ColDps">60</GridLength>
+        <GridLength x:Key="ColHits">46</GridLength>
+        <GridLength x:Key="BdDmg">54</GridLength>
+        <GridLength x:Key="BdDps">54</GridLength>
+        <GridLength x:Key="BdPct">44</GridLength>
+        <GridLength x:Key="BdCasts">42</GridLength>
+        <GridLength x:Key="BdHits">38</GridLength>
+        <GridLength x:Key="BdAph">50</GridLength>
+        <GridLength x:Key="BdMax">54</GridLength>
+        <Style x:Key="BdCell" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <!-- Tab footer: teks kecil, latar aksen tipis kalau aktif (Tag="active") -->
+        <Style x:Key="TabButton" TargetType="Button">
+            <Setter Property="Foreground" Value="#D4D4D4"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="2" Padding="6,1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Tag" Value="active">
+                                <Setter TargetName="Bg" Property="Background" Value="#66C0504D"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="HeaderCell" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ValueCell" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <!-- satuan (k/m/%) lebih kecil & abu-abu, kayak LOA -->
+        <Style x:Key="UnitRun" TargetType="Run">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="#A3A3A3"/>
+        </Style>        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <!-- Tombol ikon polos ala LOA: abu-abu, jadi terang saat hover -->
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Foreground" Value="#D4D4D4"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#33FFFFFF"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border x:Name="RootBorder" Background="#F2171717" CornerRadius="4" BorderBrush="#33FFFFFF" BorderThickness="1">
+        <DockPanel>
+            <!-- Header: timer, T.DMG, T.DPS, tombol. Area kosong bisa di-drag buat geser jendela. -->
+            <Grid DockPanel.Dock="Top" Height="28" Background="#CC171717" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock x:Name="TimerText" Text="00:00" Width="42" FontSize="13" Foreground="#E5E5E5"/>
+                    <TextBlock Text="T. DMG" FontSize="12" Foreground="#A3A3A3" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TotalDmgText" Text="0" FontSize="13" Foreground="#D4D4D4" VerticalAlignment="Center"/>
+                    <TextBlock Text="T. DPS" FontSize="12" Foreground="#A3A3A3" Margin="12,0,4,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TotalDpsText" Text="0" FontSize="13" Foreground="#D4D4D4" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="AllBadge" Text="SEMUA" FontSize="10" FontWeight="Bold" Foreground="#F5A623"
+                               Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"
+                               ToolTip="Damage pemain di luar party ikut ditampilkan"/>
+                    <TextBlock x:Name="PausedBadge" Text="PAUSED" FontSize="10" FontWeight="Bold" Foreground="#F5A623"
+                               Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
+                    <!-- On/off damage pemain di luar party (E716 = People). Oranye = ON. -->
+                    <Button x:Name="OutsidePartyButton" Style="{StaticResource IconButton}" Content="&#xE716;"
+                            ToolTip="Damage di luar party: OFF (cuma party)" Click="OutsidePartyButton_Click"/>
+                    <Button x:Name="ResetButton" Style="{StaticResource IconButton}" Content="&#xE72C;" ToolTip="Reset" Click="ResetButton_Click"/>
+                    <Button x:Name="PauseButton" Style="{StaticResource IconButton}" Content="&#xE769;" ToolTip="Pause" Click="PauseButton_Click"/>
+                    <Button x:Name="MenuButton" Style="{StaticResource IconButton}" Content="&#xE70D;" ToolTip="Menu" Click="MenuButton_Click"/>
+                    <Button Style="{StaticResource IconButton}" Content="&#xE921;" ToolTip="Minimize" Click="MinimizeButton_Click"/>
+                    <Button Style="{StaticResource IconButton}" Content="&#xE8BB;" ToolTip="Tutup" Click="CloseButton_Click"/>
+                </StackPanel>
+
+                <!-- Menu dropdown -->
+                <Popup x:Name="MenuPopup" PlacementTarget="{Binding ElementName=MenuButton}" Placement="Bottom"
+                       StaysOpen="False" AllowsTransparency="True" HorizontalOffset="-200">
+                    <Border Background="#F2262626" CornerRadius="6" Padding="10,8" Width="240" BorderBrush="#33FFFFFF" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="Nama kamu" FontSize="11" Foreground="#A3A3A3"/>
+                            <TextBox x:Name="SelfNameBox" Height="22" FontSize="11" Margin="0,2,0,8" VerticalContentAlignment="Center"
+                                     Background="#171717" Foreground="#E5E5E5" BorderBrush="#404040" CaretBrush="White"
+                                     KeyDown="SelfNameBox_KeyDown" ToolTip="Ketik lalu Enter"/>
+                            <CheckBox x:Name="TransparentCheck" Content="Transparan" Foreground="#D4D4D4" FontSize="11"
+                                      Checked="TransparentCheck_Changed" Unchecked="TransparentCheck_Changed" Margin="0,0,0,8"/>
+                            <Button Content="Pilih folder game..." Style="{StaticResource TabButton}" Tag="active" HorizontalAlignment="Left"
+                                    Margin="0,0,0,8" Click="GameDirButton_Click"
+                                    ToolTip="Folder Seal Online (berisi folder etc) - dipakai untuk nama skill, monster, dan item"/>
+                            <TextBlock x:Name="StatusText" Text="..." FontSize="10" Foreground="#8A8A8A" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+            </Grid>
+
+            <!-- Footer tab ala LOA -->
+            <Grid DockPanel.Dock="Bottom" Height="24" Background="#B3262626">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                    <Button x:Name="TabDps" Content="DPS" Style="{StaticResource TabButton}" Tag="active" Click="TabDps_Click"/>
+                    <Button x:Name="TabTarget" Content="TARGET" Style="{StaticResource TabButton}" Click="TabTarget_Click"/>
+                </StackPanel>
+                <TextBlock Text="Seal DPS Meter" FontSize="11" Foreground="#8A8A8A" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            </Grid>
+
+            <Grid>
+            <DockPanel x:Name="DpsTabContent">
+            <!-- Bar konteks target: muncul kalau tabel ini dibuka dari tab TARGET -->
+            <Grid x:Name="ScopeBar" DockPanel.Dock="Top" Height="26" Background="#CC3A1F1E" Visibility="Collapsed"
+                  MouseRightButtonUp="PartyView_RightClick">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource IconButton}" Content="&#xE72B;" ToolTip="Kembali ke daftar target (klik kanan)" Click="ScopeBack_Click" Height="22"/>
+                    <TextBlock Text="Target:" FontSize="12" Foreground="#A3A3A3" VerticalAlignment="Center" Margin="2,0,4,0"/>
+                    <TextBlock x:Name="ScopeName" FontSize="12" Foreground="#F5F5F5" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+                <TextBlock x:Name="ScopeDmg" FontSize="12" Foreground="#E5E5E5" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            </Grid>
+            <Grid>
+            <!-- ===== Tampilan party (default) ===== -->
+            <DockPanel x:Name="PartyView" Background="Transparent" MouseRightButtonUp="PartyView_RightClick">
+                <!-- Tabel pemain ala LOA Logs: header kolom sticky + baris 28px, bar warna di belakang baris -->
+                <Grid DockPanel.Dock="Top" Height="24" Background="#171717" TextElement.Foreground="#D4D4D4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="{StaticResource ColDmg}"/>
+                        <ColumnDefinition Width="{StaticResource ColPct}"/>
+                        <ColumnDefinition Width="{StaticResource ColDps}"/>
+                        <ColumnDefinition Width="{StaticResource ColHits}"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="1" Text="DMG" Style="{StaticResource HeaderCell}" ToolTip="Damage Dealt"/>
+                    <TextBlock Grid.Column="2" Text="D%" Style="{StaticResource HeaderCell}" ToolTip="Damage % dari total party"/>
+                    <TextBlock Grid.Column="3" Text="DPS" Style="{StaticResource HeaderCell}" ToolTip="Damage per second"/>
+                    <TextBlock Grid.Column="4" Text="Hits" Style="{StaticResource HeaderCell}" ToolTip="Jumlah hit"/>
+                </Grid>
+
+                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                    <ItemsControl x:Name="PlayerList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid x:Name="Row" Height="28" Background="Transparent" Cursor="Hand" MouseLeftButtonUp="PlayerRow_Click"
+                                      Visibility="{Binding IsShown, Converter={StaticResource BoolToVis}}">
+                                    <!-- bar damage (relatif ke top damage), di belakang teks -->
+                                    <Border Background="{Binding BarBrush}" Opacity="0.6"
+                                            local:BarAnimator.Scale="{Binding BarScale}"/>
+                                    <Grid TextElement.Foreground="#E5E5E5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="{StaticResource ColDmg}"/>
+                                            <ColumnDefinition Width="{StaticResource ColPct}"/>
+                                            <ColumnDefinition Width="{StaticResource ColDps}"/>
+                                            <ColumnDefinition Width="{StaticResource ColHits}"/>
+                                        </Grid.ColumnDefinitions>
+                                        <DockPanel Grid.Column="0" Margin="6,0,4,0">
+                                            <ContentPresenter DockPanel.Dock="Left" Content="{Binding}" ContentTemplate="{StaticResource JobBadge}" Margin="0,0,5,0"/>
+                                            <TextBlock x:Name="NameText" Text="{Binding Name}" FontSize="13"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </DockPanel>
+                                        <TextBlock Grid.Column="1" Style="{StaticResource ValueCell}" ToolTip="{Binding DamageFull}">
+                                            <Run Text="{Binding DamageNum, Mode=OneWay}"/><Run Text="{Binding DamageUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="2" Style="{StaticResource ValueCell}">
+                                            <Run Text="{Binding PercentText, Mode=OneWay}"/><Run Text="%" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="3" Style="{StaticResource ValueCell}" ToolTip="{Binding DpsFull}">
+                                            <Run Text="{Binding DpsNum, Mode=OneWay}"/><Run Text="{Binding DpsUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="4" Style="{StaticResource ValueCell}" Text="{Binding Hits}"/>
+                                    </Grid>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="NameText" Property="TextDecorations" Value="Underline"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+            </DockPanel>
+
+            <!-- ===== Breakdown skill 1 pemain (klik nama; klik kanan / tombol back = kembali) ===== -->
+            <DockPanel x:Name="BreakdownView" Visibility="Collapsed" Background="Transparent" MouseRightButtonUp="BreakdownView_RightClick">
+                <Grid DockPanel.Dock="Top" Height="24" Background="#F20A0A0A" TextElement.Foreground="#D4D4D4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="{StaticResource BdDmg}"/>
+                        <ColumnDefinition Width="{StaticResource BdDps}"/>
+                        <ColumnDefinition Width="{StaticResource BdPct}"/>
+                        <ColumnDefinition Width="{StaticResource BdCasts}"/>
+                        <ColumnDefinition Width="{StaticResource BdHits}"/>
+                        <ColumnDefinition Width="{StaticResource BdAph}"/>
+                        <ColumnDefinition Width="{StaticResource BdMax}"/>
+                    </Grid.ColumnDefinitions>                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource IconButton}" Content="&#xE72B;" ToolTip="Kembali (klik kanan)" Click="BackButton_Click" Height="22"/>
+                        <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource JobBadge}" Margin="2,0,4,0"/>
+                        <TextBlock Text="{Binding Name}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        <Button Content="EQUIP" Style="{StaticResource TabButton}" Tag="active" Margin="6,0,0,0" Click="EquipButton_Click"
+                                ToolTip="Lihat equip pemain ini (dari data karakter yang dikirim server)"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="DMG" Style="{StaticResource HeaderCell}" ToolTip="Damage Dealt"/>
+                    <TextBlock Grid.Column="2" Text="DPS" Style="{StaticResource HeaderCell}" ToolTip="Damage per second"/>
+                    <TextBlock Grid.Column="3" Text="D%" Style="{StaticResource HeaderCell}" ToolTip="Damage % (baris total: dari party, baris skill: dari pemain ini)"/>
+                    <TextBlock Grid.Column="4" Text="Casts" Style="{StaticResource HeaderCell}" ToolTip="Jumlah cast (hit skill yang sama dalam 500ms = 1 cast)"/>
+                    <TextBlock Grid.Column="5" Text="Hits" Style="{StaticResource HeaderCell}" ToolTip="Jumlah hit"/>
+                    <TextBlock Grid.Column="6" Text="APH" Style="{StaticResource HeaderCell}" ToolTip="Rata-rata damage per hit"/>
+                    <TextBlock Grid.Column="7" Text="MaxH" Style="{StaticResource HeaderCell}" ToolTip="Hit terbesar"/>
+                </Grid>
+
+                <!-- baris total pemain (bar penuh) -->
+                <Grid DockPanel.Dock="Top" Height="28" TextElement.Foreground="#E5E5E5">
+                    <Border Background="{Binding BarBrush}" Opacity="0.6"/>
+                    <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="{StaticResource BdDmg}"/>
+                        <ColumnDefinition Width="{StaticResource BdDps}"/>
+                        <ColumnDefinition Width="{StaticResource BdPct}"/>
+                        <ColumnDefinition Width="{StaticResource BdCasts}"/>
+                        <ColumnDefinition Width="{StaticResource BdHits}"/>
+                        <ColumnDefinition Width="{StaticResource BdAph}"/>
+                        <ColumnDefinition Width="{StaticResource BdMax}"/>
+                    </Grid.ColumnDefinitions>                        <TextBlock Grid.Column="0" Text="Total" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,4,0"/>
+                        <TextBlock Grid.Column="1" Style="{StaticResource BdCell}" ToolTip="{Binding DamageFull}">
+                            <Run Text="{Binding DamageNum, Mode=OneWay}"/><Run Text="{Binding DamageUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="2" Style="{StaticResource BdCell}" ToolTip="{Binding DpsFull}">
+                            <Run Text="{Binding DpsNum, Mode=OneWay}"/><Run Text="{Binding DpsUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="3" Style="{StaticResource BdCell}">
+                            <Run Text="{Binding PercentText, Mode=OneWay}"/><Run Text="%" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="4" Style="{StaticResource BdCell}" Text="{Binding Casts}"/>
+                        <TextBlock Grid.Column="5" Style="{StaticResource BdCell}" Text="{Binding Hits}"/>
+                        <TextBlock Grid.Column="6" Style="{StaticResource BdCell}" ToolTip="{Binding AphFull}">
+                            <Run Text="{Binding AphNum, Mode=OneWay}"/><Run Text="{Binding AphUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="7" Style="{StaticResource BdCell}" ToolTip="{Binding MaxFull}">
+                            <Run Text="{Binding MaxNum, Mode=OneWay}"/><Run Text="{Binding MaxUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>                    </Grid>
+                </Grid>
+
+                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                    <ItemsControl x:Name="SkillList" ItemsSource="{Binding Breakdown}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="28" TextElement.Foreground="#E5E5E5">
+                                    <Border Background="{Binding DataContext.BarBrush, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Opacity="0.6" local:BarAnimator.Scale="{Binding BarScale}"/>
+                                    <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="{StaticResource BdDmg}"/>
+                        <ColumnDefinition Width="{StaticResource BdDps}"/>
+                        <ColumnDefinition Width="{StaticResource BdPct}"/>
+                        <ColumnDefinition Width="{StaticResource BdCasts}"/>
+                        <ColumnDefinition Width="{StaticResource BdHits}"/>
+                        <ColumnDefinition Width="{StaticResource BdAph}"/>
+                        <ColumnDefinition Width="{StaticResource BdMax}"/>
+                    </Grid.ColumnDefinitions>                                        <TextBlock Grid.Column="0" Text="{Binding Kind}" FontSize="12" VerticalAlignment="Center"
+                                                   Margin="8,0,4,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Kind}"/>
+                        <TextBlock Grid.Column="1" Style="{StaticResource BdCell}" ToolTip="{Binding DamageFull}">
+                            <Run Text="{Binding DamageNum, Mode=OneWay}"/><Run Text="{Binding DamageUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="2" Style="{StaticResource BdCell}" ToolTip="{Binding DpsFull}">
+                            <Run Text="{Binding DpsNum, Mode=OneWay}"/><Run Text="{Binding DpsUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="3" Style="{StaticResource BdCell}">
+                            <Run Text="{Binding PercentText, Mode=OneWay}"/><Run Text="%" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="4" Style="{StaticResource BdCell}" Text="{Binding Casts}"/>
+                        <TextBlock Grid.Column="5" Style="{StaticResource BdCell}" Text="{Binding Hits}"/>
+                        <TextBlock Grid.Column="6" Style="{StaticResource BdCell}" ToolTip="{Binding AphFull}">
+                            <Run Text="{Binding AphNum, Mode=OneWay}"/><Run Text="{Binding AphUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="7" Style="{StaticResource BdCell}" ToolTip="{Binding MaxFull}">
+                            <Run Text="{Binding MaxNum, Mode=OneWay}"/><Run Text="{Binding MaxUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                        </TextBlock>                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+
+            <!-- ===== Equip 1 pemain (tombol EQUIP di breakdown; klik kanan / back = kembali) ===== -->
+            <DockPanel x:Name="EquipView" Visibility="Collapsed" Background="Transparent" MouseRightButtonUp="EquipView_RightClick">
+                <Grid DockPanel.Dock="Top" Height="24" Background="#F20A0A0A" TextElement.Foreground="#D4D4D4">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource IconButton}" Content="&#xE72B;" ToolTip="Kembali (klik kanan)" Click="EquipBack_Click" Height="22"/>
+                        <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource JobBadge}" Margin="2,0,4,0"/>
+                        <TextBlock Text="{Binding Name}" FontSize="12" VerticalAlignment="Center"/>
+                        <TextBlock Text="Equip" FontSize="11" Foreground="#A3A3A3" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+                <TextBlock x:Name="EquipEmptyText" DockPanel.Dock="Top" Visibility="Collapsed" TextWrapping="Wrap" Margin="10,10"
+                           FontSize="11" Foreground="#A3A3A3"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="EquipList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="22" TextElement.Foreground="#E5E5E5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="92"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Slot}" FontSize="11" Foreground="#A3A3A3" VerticalAlignment="Center" Margin="10,0,4,0"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding RefineText}" FontSize="12" FontWeight="SemiBold" Foreground="#F5A623"
+                                               VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+            </Grid>
+            </DockPanel>
+
+            <!-- ===== Tab TARGET: damage per monster yang kena hit (klik = lihat pemain & skill ke monster ini) ===== -->
+            <DockPanel x:Name="TargetView" Visibility="Collapsed">
+                <Grid DockPanel.Dock="Top" Height="24" Background="#171717" TextElement.Foreground="#D4D4D4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="{StaticResource ColDmg}"/>
+                        <ColumnDefinition Width="{StaticResource ColPct}"/>
+                        <ColumnDefinition Width="{StaticResource ColDps}"/>
+                        <ColumnDefinition Width="{StaticResource ColHits}"/>
+                        <ColumnDefinition Width="{StaticResource ColDmg}"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Target" Style="{StaticResource HeaderCell}" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                    <TextBlock Grid.Column="1" Text="DMG" Style="{StaticResource HeaderCell}" ToolTip="Total damage ke target ini"/>
+                    <TextBlock Grid.Column="2" Text="D%" Style="{StaticResource HeaderCell}" ToolTip="Porsi dari total damage ke semua target"/>
+                    <TextBlock Grid.Column="3" Text="DPS" Style="{StaticResource HeaderCell}" ToolTip="Damage per second ke target ini (hit pertama s/d terakhir)"/>
+                    <TextBlock Grid.Column="4" Text="Hits" Style="{StaticResource HeaderCell}" ToolTip="Jumlah hit"/>
+                    <TextBlock Grid.Column="5" Text="HP" Style="{StaticResource HeaderCell}" ToolTip="HP penuh (perkiraan dari sisa HP di paket damage)"/>
+                </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                    <ItemsControl x:Name="TargetList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid x:Name="TRow" Height="28" TextElement.Foreground="#E5E5E5" Background="Transparent" Cursor="Hand"
+                                      MouseLeftButtonUp="TargetRow_Click" Visibility="{Binding IsShown, Converter={StaticResource BoolToVis}}">
+                                    <Border Background="#C0504D" Opacity="0.6" local:BarAnimator.Scale="{Binding BarScale}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="{StaticResource ColDmg}"/>
+                                            <ColumnDefinition Width="{StaticResource ColPct}"/>
+                                            <ColumnDefinition Width="{StaticResource ColDps}"/>
+                                            <ColumnDefinition Width="{StaticResource ColHits}"/>
+                                            <ColumnDefinition Width="{StaticResource ColDmg}"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="8,0,4,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}">
+                                            <Run Text="{Binding Name, Mode=OneWay}" FontSize="12"/>
+                                            <Run Text="{Binding IdText, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="1" Style="{StaticResource ValueCell}" ToolTip="{Binding DamageFull}">
+                                            <Run Text="{Binding DamageNum, Mode=OneWay}"/><Run Text="{Binding DamageUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="2" Style="{StaticResource ValueCell}">
+                                            <Run Text="{Binding PercentText, Mode=OneWay}"/><Run Text="%" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="3" Style="{StaticResource ValueCell}" ToolTip="{Binding DpsFull}">
+                                            <Run Text="{Binding DpsNum, Mode=OneWay}"/><Run Text="{Binding DpsUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="4" Style="{StaticResource ValueCell}" Text="{Binding Hits}"/>
+                                        <TextBlock Grid.Column="5" Style="{StaticResource ValueCell}" ToolTip="{Binding HpFull}">
+                                            <Run Text="{Binding HpNum, Mode=OneWay}"/><Run Text="{Binding HpUnit, Mode=OneWay}" Style="{StaticResource UnitRun}"/>
+                                        </TextBlock>
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+            </Grid>
+        </DockPanel>
+    </Border>
+</Window>

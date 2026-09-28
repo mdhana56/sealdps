@@ -1,0 +1,419 @@
+<title>Seal Item Codex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #eef1f6;
+    --surface: #ffffff;
+    --surface-2: #f5f7fb;
+    --line: #dde3ec;
+    --ink: #17202b;
+    --muted: #5d6b7d;
+    --faint: #9aa6b5;
+    --accent: #2f5bd3;
+    --accent-soft: #e4ebfc;
+    --t-base: #6b7686;
+    --t-g: #1f8a52;
+    --t-dg: #2463d6;
+    --t-xg: #8a3fd1;
+    --t-r: #b5700f;
+    --t-gx: #0f8a8a;
+    --shadow: 0 1px 2px rgba(23, 32, 43, .05), 0 6px 20px rgba(23, 32, 43, .06);
+    --display: "Marcellus", "Trajan Pro", Georgia, serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0d1219; --surface: #151c26; --surface-2: #1b2430; --line: #28323f;
+      --ink: #e5ebf2; --muted: #98a6b8; --faint: #5d6a7b; --accent: #89a8ff; --accent-soft: #1e2a44;
+      --t-base: #9aa5b4; --t-g: #4cc98a; --t-dg: #6f9dff; --t-xg: #c08cf2; --t-r: #e2a445; --t-gx: #4fc9c9;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0d1219; --surface: #151c26; --surface-2: #1b2430; --line: #28323f;
+    --ink: #e5ebf2; --muted: #98a6b8; --faint: #5d6a7b; --accent: #89a8ff; --accent-soft: #1e2a44;
+    --t-base: #9aa5b4; --t-g: #4cc98a; --t-dg: #6f9dff; --t-xg: #c08cf2; --t-r: #e2a445; --t-gx: #4fc9c9;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font: 14px/1.5 var(--body); padding-inline: 16px; padding-block: 20px 40px; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 14px; }
+
+  /* ---------- Header + pencarian ---------- */
+  header.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+  h1 { font: 400 30px/1.1 var(--display); margin: 0; }
+  .sub { color: var(--muted); font-size: 13px; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+  .controls { padding: 14px; display: grid; gap: 12px; }
+  .searchbox { position: relative; }
+  .searchbox svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; color: var(--faint); pointer-events: none; }
+  #q {
+    width: 100%; font: 16px var(--body); color: var(--ink); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px 40px 12px 42px;
+  }
+  #q::placeholder { color: var(--faint); }
+  #clear {
+    position: absolute; right: 8px; top: 50%; translate: 0 -50%; border: 0; background: transparent;
+    color: var(--muted); font-size: 18px; width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
+  }
+  #clear:hover { background: var(--line); }
+  .suggest { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12.5px; color: var(--muted); }
+  .suggest button {
+    border: 0; background: transparent; color: var(--accent); cursor: pointer; padding: 2px 4px; border-radius: 4px;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  .seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .seg button {
+    border: 0; background: transparent; color: var(--muted); padding: 5px 11px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); font-weight: 500; }
+  .seg.tiers button[data-tier="g"][aria-pressed="true"] { color: var(--t-g); }
+  .seg.tiers button[data-tier="dg"][aria-pressed="true"] { color: var(--t-dg); }
+  .seg.tiers button[data-tier="xg"][aria-pressed="true"] { color: var(--t-xg); }
+  .sortbox { display: flex; align-items: center; gap: 6px; margin-left: auto; font-size: 13px; color: var(--muted); }
+  select {
+    font: 13px var(--body); color: var(--ink); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px;
+  }
+
+  /* ---------- Daftar + detail ---------- */
+  .main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: 14px; align-items: start; }
+  .list { overflow: hidden; }
+  .list-head {
+    display: flex; justify-content: space-between; align-items: center; padding: 10px 14px;
+    border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted);
+  }
+  .cols { display: grid; grid-template-columns: 72px 44px 44px; gap: 8px; text-align: right; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  .items { max-height: calc(100vh - 290px); min-height: 320px; overflow-y: auto; }
+  .item {
+    width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 72px 44px 44px; gap: 8px; align-items: center;
+    padding: 10px 14px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer;
+  }
+  .item:hover { background: var(--surface-2); }
+  .item[aria-current="true"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .item .nm { min-width: 0; }
+  .item .nm b { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item .nm small { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; color: var(--muted); font-size: 12px; }
+  .n { font: 13px var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .n small { display: block; font: 10px var(--body); color: var(--faint); letter-spacing: .04em; }
+  .n.zero { color: var(--faint); }
+  .more { display: flex; justify-content: center; padding: 12px; }
+  .btn {
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+    border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 13px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .empty { padding: 40px 18px; color: var(--muted); text-align: center; display: grid; gap: 8px; justify-items: center; }
+
+  .tier { display: inline-block; font: 600 10px var(--mono); letter-spacing: .04em; padding: 0 5px; border-radius: 4px; border: 1px solid currentColor; line-height: 16px; }
+  .tier.base { color: var(--t-base); } .tier.g { color: var(--t-g); } .tier.dg { color: var(--t-dg); }
+  .tier.xg { color: var(--t-xg); } .tier.r { color: var(--t-r); } .tier.gx { color: var(--t-gx); }
+
+  /* Panel detail menempel saat daftar di-scroll; kalau isinya lebih tinggi dari layar,
+     panel ini punya scroll sendiri supaya bagian bawah tidak terpotong. */
+  .detail {
+    padding: 18px; display: grid; gap: 16px; align-content: start;
+    position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px);
+    max-height: calc(100vh - 24px - env(safe-area-inset-top, 0px)); overflow-y: auto;
+  }
+  /* Anak grid default-nya min-width:auto -> tooltip/tabel bisa melebar keluar panel. */
+  .detail > * { min-width: 0; }
+  .back { display: none; justify-self: start; }
+  .detail h2 { font: 400 22px/1.25 var(--display); margin: 0; overflow-wrap: anywhere; text-wrap: balance; }
+  .meta { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .sec h3 { font: 600 11px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  .tierpick button[data-tier="g"][aria-pressed="true"] { color: var(--t-g); }
+  .tierpick button[data-tier="dg"][aria-pressed="true"] { color: var(--t-dg); }
+  .tierpick button[data-tier="xg"][aria-pressed="true"] { color: var(--t-xg); }
+
+  table.set { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.set th, table.set td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  table.set th:first-child, table.set td:first-child { text-align: left; }
+  table.set th { font: 500 11px var(--body); color: var(--muted); }
+  table.set td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  table.set td:first-child { font-family: var(--body); color: var(--muted); }
+  table.set .on { background: var(--accent-soft); }
+  .setwrap { overflow-x: auto; }
+  .members { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .member {
+    border: 1px solid var(--line); background: var(--surface-2); border-radius: 6px; padding: 4px 9px; cursor: pointer; font-size: 12.5px; text-align: left;
+  }
+  .member[aria-current="true"] { border-color: var(--accent); color: var(--accent); }
+  .note { font-size: 12px; color: var(--muted); max-width: 62ch; margin: 0; }
+  footer { color: var(--muted); font-size: 12px; }
+
+  /* ---------- Tooltip bergaya in-game (satu tampilan tetap, semua warna eksplisit) ---------- */
+  .gtip {
+    background: #d8d5d2; color: #1d1d1d; border: 1px solid #aaa6a2; border-radius: 6px; padding: 13px 15px;
+    font: 13px/1.5 "IBM Plex Sans", Tahoma, "Segoe UI", sans-serif; display: grid; gap: 9px;
+  }
+  .gt-name { font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+  .gt-block { display: grid; gap: 0; }
+  .gt-special { color: #2c8a2c; }
+  .gt-type { color: #8a1fb0; }
+  .gt-req { color: #2330b8; }
+  .gt-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; color: #2330b8; font-variant-numeric: tabular-nums; }
+  .gt-set { color: #b3261e; }
+  .gt-set b { display: block; }
+  .gt-set .gt-stats { color: #b3261e; }
+  .gt-desc { white-space: pre-line; color: #2a2a2a; }
+
+  /* ---------- HP: daftar & detail jadi dua layar ---------- */
+  @media (max-width: 880px) {
+    .main { grid-template-columns: 1fr; }
+    .detail { position: static; max-height: none; overflow: visible; }
+    .items { max-height: none; }
+    body.show-detail .list, body.show-detail .controls { display: none; }
+    body:not(.show-detail) .detail { display: none; }
+    .back { display: inline-block; }
+    .sortbox { margin-left: 0; }
+  }
+  @media (max-width: 460px) {
+    .cols, .item { grid-template-columns: minmax(0, 1fr) 64px 40px 40px; }
+    .cols { grid-template-columns: 64px 40px 40px; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Seal Item Codex</h1>
+    <span class="sub" id="sub"></span>
+  </header>
+
+  <section class="panel controls" aria-label="Pencarian">
+    <div class="searchbox">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <label for="q" style="position:absolute;left:-9999px">Cari nama item</label>
+      <input id="q" type="search" placeholder="Cari item, mis. einhorn helmet" autocomplete="off" spellcheck="false">
+      <button type="button" id="clear" aria-label="Hapus pencarian" hidden>×</button>
+    </div>
+    <div class="suggest" id="suggest">Coba:
+      <button type="button">Einhorn</button><button type="button">Hellscream</button>
+      <button type="button">Dragon Inferno</button><button type="button">Samael</button>
+    </div>
+    <div class="filters">
+      <div class="seg" id="groups" role="group" aria-label="Kelompok"></div>
+      <div class="seg tiers" id="tiers" role="group" aria-label="Tingkat"></div>
+      <label class="sortbox" for="sort">Urutkan
+        <select id="sort">
+          <option value="name">Nama</option>
+          <option value="main">Damage / Defense</option>
+          <option value="di">Damage increase</option>
+          <option value="dd">Damage decrease</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="panel list" aria-label="Hasil">
+      <div class="list-head"><span id="count"></span><span class="cols"><span>Utama</span><span>DI%</span><span>DD%</span></span></div>
+      <div class="items" id="items"></div>
+    </section>
+    <article class="panel detail" id="detail" aria-live="polite"></article>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const F = Object.fromEntries(D.fields.map((f, i) => [f, i]));
+  const $ = id => document.getElementById(id);
+  const fmt = n => n.toLocaleString("id-ID");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const v = (it, k) => it.raw[F[k]];
+
+  // ---------- Model: item & keluarga tingkat (Biasa -> G -> DG -> XG lewat kolom "upgrade ke") ----------
+  const TIER_RE = /(?:\.|\s)\s*(XG|DG|GX|G|R)(?![A-Za-z])/;
+  const TIER_NAME = { base: "Biasa", g: "G", dg: "DG", xg: "XG", gx: "GX", r: "R" };
+  const items = D.items.map(a => {
+    const it = { raw: a, id: a[F.id], name: a[F.name] };
+    const m = it.name.match(TIER_RE);
+    it.tier = m ? m[1].toLowerCase() : "base";
+    const t = D.types[String(a[F.type])] || ["Misc", "Tipe " + a[F.type]];
+    it.group = t[0]; it.typeLabel = t[1];
+    it.lc = it.name.toLowerCase();
+    return it;
+  });
+  const byId = new Map(items.map(it => [it.id, it]));
+  const parentOf = new Map();
+  for (const it of items) { const up = v(it, "up"); if (up && up !== it.id && byId.has(up)) parentOf.set(up, it); }
+
+  const families = [], famOf = new Map();
+  for (const it of items) {
+    if (famOf.has(it.id)) continue;
+    let root = it; const seen = new Set([it.id]);
+    for (let p = parentOf.get(root.id); p && !seen.has(p.id); p = parentOf.get(p.id)) { seen.add(p.id); root = p; }
+    const members = [root]; const s2 = new Set([root.id]);
+    for (let id = v(root, "up"); id && byId.has(id) && !s2.has(id); id = v(byId.get(id), "up")) { s2.add(id); members.push(byId.get(id)); }
+    if (!members.includes(it)) members.push(it);
+    const fam = { members, name: root.name.replace(TIER_RE, "").trim() || root.name, group: root.group, typeLabel: root.typeLabel };
+    fam.lc = members.map(m => m.lc).join(" | ");
+    for (const m of members) if (!famOf.has(m.id)) famOf.set(m.id, fam);
+    families.push(fam);
+  }
+  const setMembers = new Map();
+  for (const it of items) { const s = v(it, "set"); if (s) { if (!setMembers.has(s)) setMembers.set(s, []); setMembers.get(s).push(it); } }
+
+  // Angka utama di daftar: senjata -> Damage (atau Magic Power kalau lebih besar), lainnya -> Defense.
+  const mainStat = it => {
+    if (it.group === "Senjata") return v(it, "mpw") > v(it, "dmg") ? ["MPW", v(it, "mpw")] : ["DMG", v(it, "dmg")];
+    return ["DEF", v(it, "def")];
+  };
+
+  // ---------- Label (terverifikasi dengan tooltip in-game) ----------
+  const STAT_DEFS = [
+    ["dmg", "Damage"], ["mpw", "Magic Power"], ["def", "Defense"], ["aspd", "Attack Speed"],
+    ["crit", "Critical Rate"], ["acc", "Accuracy"], ["eva", "Evasion Rate"],
+    ["di", "Damage increase", " %"], ["dd", "Damage decrease", " %"],
+    ["move", "Moving Speed"], ["hp", "HP increase"], ["ap", "AP increase"],
+  ];
+  const SET_DEFS = [
+    [1, "Damage", ""], [2, "Magic Power", ""], [3, "Defense", ""], [4, "Attack Speed", ""],
+    [8, "Moving Speed", ""], [9, "HP", "%"], [10, "AP", "%"],
+    [13, "Damage increase", "%"], [14, "Damage decrease", "%"], [15, "Dungeon Dmg Increase", ""],
+  ];
+  // Kolom job = bitmask. 0x12001FF = "Can be used by all classes" (terverifikasi dengan
+  // tooltip helm Einhorn). Arti bit per job belum diketahui, jadi nilai lain tidak diberi label.
+  const ALL_JOBS = 0x12001FF;
+  const TYPE_EN = { "Helm": "Head", "Helm / ikat kepala": "Head", "Baju atas": "Top", "Baju bawah": "Bottom", "Sepatu": "Shoes", "Perisai": "Shield" };
+
+  function tooltipHtml(it) {
+    const stats = STAT_DEFS.filter(([k]) => v(it, k)).map(([k, l, u = ""]) => `<span>${l} ${fmt(v(it, k))}${u}</span>`).join("");
+    const setId = v(it, "set"), rows = setId && D.sets[setId];
+    const full = rows ? rows[rows.length - 1] : null;
+    const setLines = full ? SET_DEFS.filter(([i]) => full[i]).map(([i, l, u]) => `<span>${l} +${fmt(full[i])}${u}</span>`).join("") : "";
+    const jobs = v(it, "jobs"), desc = D.descs[it.raw[F.desc]];
+    return `<div class="gt-name">${esc(it.name)}</div>
+      <div class="gt-block">
+        <span class="gt-type">${esc(TYPE_EN[it.typeLabel] || it.typeLabel)}</span>
+        ${jobs === ALL_JOBS ? `<span class="gt-req">Can be used by all classes</span>` : ""}
+        ${v(it, "fame") ? `<span class="gt-req">Fame Requirement ${fmt(v(it, "fame"))}</span>` : ""}
+      </div>
+      ${stats ? `<div class="gt-stats">${stats}</div>` : ""}
+      ${setLines ? `<div class="gt-set"><b>Set option activation.</b><div class="gt-stats">${setLines}</div></div>` : ""}
+      ${desc ? `<div class="gt-desc">${esc(desc)}</div>` : ""}`;
+  }
+
+  // ---------- State + kontrol ----------
+  const GROUPS = ["Semua", "Senjata", "Armor", "Aksesoris"];
+  const TIERS = [["", "Semua tingkat"], ["base", "Biasa"], ["g", "G"], ["dg", "DG"], ["xg", "XG"]];
+  const state = { q: "", group: "Semua", tier: "", sort: "name", limit: 100, sel: null };
+
+  $("groups").innerHTML = GROUPS.map(g => `<button type="button" data-g="${g}" aria-pressed="${g === state.group}">${g}</button>`).join("");
+  $("tiers").innerHTML = TIERS.map(([t, l]) => `<button type="button" data-tier="${t}" aria-pressed="${t === state.tier}">${l}</button>`).join("");
+  const press = (box, attr, val) => { for (const b of box.children) b.setAttribute("aria-pressed", String(b.getAttribute(attr) === val)); };
+  $("groups").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.group = b.dataset.g; press($("groups"), "data-g", state.group); state.limit = 100; render(); });
+  $("tiers").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.tier = b.dataset.tier; press($("tiers"), "data-tier", state.tier); state.limit = 100; render(); });
+  $("sort").addEventListener("change", e => { state.sort = e.target.value; render(); });
+  const setQuery = q => { state.q = q; $("q").value = q; $("clear").hidden = !q; state.limit = 100; render(); };
+  $("q").addEventListener("input", e => setQuery(e.target.value));
+  $("clear").addEventListener("click", () => { setQuery(""); $("q").focus(); });
+  $("suggest").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setQuery(b.textContent.toLowerCase()); });
+
+  // Anggota keluarga yang ditampilkan di daftar: sesuai filter tingkat, kalau tidak tingkat tertinggi.
+  const shownMember = fam => (state.tier ? fam.members.find(m => m.tier === state.tier) : null) || fam.members[fam.members.length - 1];
+
+  function results() {
+    const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+    const out = [];
+    for (const fam of families) {
+      if (state.group !== "Semua" && fam.group !== state.group) continue;
+      if (state.tier && !fam.members.some(m => m.tier === state.tier)) continue;
+      if (words.length && !words.every(w => fam.lc.includes(w) || fam.members.some(m => String(m.id) === w))) continue;
+      out.push(fam);
+    }
+    const key = { main: m => mainStat(m)[1], di: m => v(m, "di"), dd: m => v(m, "dd") }[state.sort];
+    if (key) out.sort((a, b) => key(shownMember(b)) - key(shownMember(a)) || a.name.localeCompare(b.name));
+    else out.sort((a, b) => a.name.localeCompare(b.name));
+    return out;
+  }
+
+  const num = (x, label) => `<span class="n ${x ? "" : "zero"}">${x ? fmt(x) : "–"}${label ? `<small>${label}</small>` : ""}</span>`;
+
+  function render() {
+    const list = results();
+    $("count").textContent = `${fmt(list.length)} item`;
+    const selFam = state.sel && famOf.get(state.sel);
+    $("items").innerHTML = list.length ? list.slice(0, state.limit).map(fam => {
+      const m = shownMember(fam), [ml, mv] = mainStat(m);
+      const tiers = fam.members.length > 1 ? fam.members.map(x => `<span class="tier ${x.tier}">${TIER_NAME[x.tier]}</span>`).join("") : "";
+      return `<button type="button" class="item" data-id="${m.id}" aria-current="${fam === selFam}">
+        <span class="nm"><b>${esc(fam.name)}</b><small>${esc(fam.typeLabel)}${tiers ? " · " + tiers : ""}</small></span>
+        ${num(mv, ml)}${num(v(m, "di"))}${num(v(m, "dd"))}
+      </button>`;
+    }).join("") + (list.length > state.limit ? `<div class="more"><button type="button" class="btn" id="more">Tampilkan lebih banyak (${fmt(list.length - state.limit)} lagi)</button></div>` : "")
+      : `<div class="empty"><b>Tidak ada item yang cocok.</b><span>Periksa ejaan, atau pilih "Semua" di kelompok dan tingkat.</span></div>`;
+  }
+
+  $("items").addEventListener("click", e => {
+    if (e.target.id === "more") { state.limit += 100; render(); return; }
+    const b = e.target.closest(".item"); if (!b) return;
+    select(+b.dataset.id);
+    if (matchMedia("(max-width: 880px)").matches) { document.body.classList.add("show-detail"); scrollTo(0, 0); }
+  });
+
+  // ---------- Detail ----------
+  function select(id) {
+    const it = byId.get(id); if (!it) return;
+    state.sel = id;
+    try { history.replaceState(null, "", "#" + id); } catch (_) {}
+    const fam = famOf.get(id);
+    for (const b of $("items").querySelectorAll(".item")) b.setAttribute("aria-current", String(famOf.get(+b.dataset.id) === fam));
+    renderDetail(it, fam);
+  }
+
+  function renderDetail(it, fam) {
+    const tierPick = fam && fam.members.length > 1 ? `<div class="sec"><h3>Tingkat</h3><div class="seg tierpick" role="group" aria-label="Pilih tingkat">${fam.members.map(m =>
+      `<button type="button" data-go="${m.id}" data-tier="${m.tier}" aria-pressed="${m.id === it.id}">${TIER_NAME[m.tier]}</button>`).join("")}</div></div>` : "";
+
+    const setId = v(it, "set"), rows = setId && D.sets[setId];
+    let setHtml = "";
+    if (rows) {
+      const cols = SET_DEFS.filter(([i]) => rows.some(r => r[i]));
+      // Satu set ID sering dipakai semua tingkat; tampilkan anggota yang setingkat saja.
+      const members = (setMembers.get(setId) || []).filter(m => m.tier === it.tier).sort((a, b) => a.id - b.id);
+      // Bonus ke bawah, jumlah bagian ke samping -> selalu muat di panel.
+      const last = rows.length - 1;
+      setHtml = `<div class="sec"><h3>Bonus set</h3><div class="setwrap"><table class="set">
+        <thead><tr><th>Bonus</th>${rows.map((r, i) => `<th class="${i === last ? "on" : ""}">${r[0]} bagian</th>`).join("")}</tr></thead>
+        <tbody>${cols.map(([c, l, u]) => `<tr><td>${l}</td>${rows.map((r, i) => `<td class="${i === last ? "on" : ""}">${r[c] ? "+" + fmt(r[c]) + u : "–"}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table></div>
+      ${members.length > 1 ? `<div class="members">${members.map(m => `<button type="button" class="member" data-go="${m.id}" aria-current="${m.id === it.id}">${esc(m.name)}</button>`).join("")}</div>` : ""}</div>`;
+    }
+
+    $("detail").innerHTML = `
+      <button type="button" class="btn back" id="back">← Kembali ke daftar</button>
+      <div><h2>${esc(it.name)}</h2><div class="meta">${esc(it.group)} · ${esc(it.typeLabel)} · ID ${it.id}</div></div>
+      ${tierPick}
+      <div class="gtip">${tooltipHtml(it)}</div>
+      ${setHtml}
+      <p class="note">Semua angka adalah item +0. Refine menambah sebagian stat, misalnya armor +12 mendapat +3 Damage increase dan +3 Damage decrease.</p>`;
+  }
+  $("detail").addEventListener("click", e => {
+    if (e.target.id === "back") { document.body.classList.remove("show-detail"); return; }
+    const b = e.target.closest("[data-go]"); if (b) select(+b.dataset.go);
+  });
+
+  // ---------- Mulai ----------
+  $("sub").textContent = `${fmt(families.length)} senjata, armor & aksesoris dari file game`;
+  $("foot").textContent = `Sumber: ${D.source}. Kostum, pet, item misc, dan item tanpa terjemahan tidak ditampilkan. Kelompok disusun dari kode tipe item, bukan dari dokumentasi resmi game.`;
+  const start = +location.hash.slice(1);
+  if (!byId.has(start)) setQuery("einhorn"); else render();
+  select(byId.has(start) ? start : (byId.has(24444) ? 24444 : items[0].id));
+})();
+</script>

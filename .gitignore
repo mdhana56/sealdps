@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+dist/
+*.user
+.vs/
+
+# Capture paket game - berisi traffic akun/karakter, JANGAN di-commit
+*.pcap
+*.pcapng
+
+# Hasil export data game (hak cipta milik publisher)
+exports/
+
+# Python
+__pycache__/
+*.pyc
+
+# Setting lokal Claude Code / editor
+.claude/
