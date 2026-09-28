@@ -4,6 +4,11 @@ DPS meter overlay untuk **Seal Online** (gaya LOA Logs): damage, DPS, D%, jumlah
 
 **Pasif sepenuhnya** — meter cuma *membaca* paket jaringan server→client lewat Npcap. Tidak inject, tidak baca/tulis memori game, tidak mengirim paket apa pun.
 
+> [!WARNING]
+> **Do with your own risk.** Proyek fan-made, tidak berafiliasi dengan publisher Seal Online. Segala risiko pemakaian (termasuk terhadap akun game) tanggung jawab pemakai.
+>
+> **Hanya dites di server BOD.** Server/versi lain bisa punya format paket berbeda — damage, nama, atau job bisa salah atau tidak terbaca sama sekali.
+
 ## Fitur yang sudah jalan
 
 ### Tab DPS — tabel party
@@ -106,8 +111,6 @@ Area yang masih terbuka: lihat bagian **Belum ada** di atas.
 - Ikon job: [game-icons.net](https://game-icons.net) (Lorc, Delapouite) — CC BY 3.0
 - Format file game (`.SPAK`, `.edt`): proyek open-source [unsealed](https://github.com/feryandi/unsealed)
 - Capture: [SharpPcap](https://github.com/dotpcap/sharppcap), [PacketDotNet](https://github.com/dotpcap/packetnet), [Npcap](https://npcap.com)
-
-Proyek fan-made, tidak berafiliasi dengan publisher Seal Online. Gunakan dengan risiko sendiri.
 
 ## Lisensi
 
