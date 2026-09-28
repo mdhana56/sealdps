@@ -242,3 +242,19 @@ monster yang dibunuh = HP penuhnya PERSIS (Wild Beetle 31.050.000, Shaman 27.000
 - Crit: tidak ada damage outlier di ~400 auto + ratusan skill (variasi cuma ~±3%).
   Field setelah sisa HP di CC5D/CC5E (0, kadang 1-6 di ~10-20% hit) damage-nya
   tidak beda -> belum bisa disebut crit. Butuh capture + rekaman layar buat patokan.
+
+## 2026-09-28: Skill support Apostle (dari skill.edt, belum dari paket)
+
+Semua job 25 (Apostle). Deskripsi di baris skill.edt +463, nama internal +271.
+
+| ID | Skill | Level | Efek (deskripsi game) |
+|---|---|---|---|
+| 208 | Holy Force (`SkillHolyforce`) | 21 | Damage diri + party naik, makin kuat sesuai stat magic caster. 20-35 detik. |
+| 209 | Holy Magic (`SkillHolymagic`) | 21 | Magic diri + party naik (tidak berlaku ke rumpun Priest). 20-35 detik. |
+| 206 | Bulwark (`SkillShield`) | 18 | Shield ke diri + party di dekat, menyerap 1.625 (lv1) s/d 3.850 (lv18) damage. |
+| 211 | Holy Speed | 18 | (buff Apostle lain, belum dicek) |
+
+- Besar buff Holy Force/Magic bergantung stat magic caster -> TIDAK bisa dihitung dari file game saja.
+- Belum diketahui: paket cast buff (apakah CEA5 dengan damage 0 / opcode lain), paket buff aktif/habis
+  di anggota party, dan apakah server mengirim sisa shield Bulwark. Perlu capture: Apostle cast
+  Holy Force / Holy Magic / Bulwark di party, dicatat jam cast-nya.
