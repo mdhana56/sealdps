@@ -4,6 +4,48 @@ DPS meter overlay untuk **Seal Online** (gaya LOA Logs): damage, DPS, D%, jumlah
 
 **Pasif sepenuhnya** — meter cuma *membaca* paket jaringan server→client lewat Npcap. Tidak inject, tidak baca/tulis memori game, tidak mengirim paket apa pun.
 
+## Fitur yang sudah jalan
+
+### Tab DPS — tabel party
+| Kolom | Arti |
+|---|---|
+| **DMG** | total damage pemain (hover = angka lengkap) |
+| **D%** | porsi damage dari total party |
+| **DPS** | damage per detik (dari hit pertama s/d hit terakhir pemain itu) |
+| **Hits** | jumlah hit |
+
+- Header: timer sesi, **T. DMG** (total damage party), **T. DPS** (DPS party). Timer mulai di hit pertama dan berhenti sendiri kalau 5 detik nggak ada hit.
+- Yang dihitung: **diri sendiri** (auto-attack + skill) dan **anggota party** (nama dari paket roster party). Pemain di luar party disembunyikan.
+- Badge **job** di kiri nama (ikon + warna rumpun, hover = nama job).
+- Anggota party langsung muncul (0 damage) begitu roster party terbaca, walau belum menyerang.
+- 1 karakter = 1 baris, walau entity ID-nya ganti (masuk dungeon / relog).
+
+### Breakdown skill — klik nama pemain
+Rincian per skill (dan "Auto"): DMG, DPS, D% (porsi dari damage pemain itu), **Casts** (hit skill yang sama dalam 500 ms = 1 cast, mis. skill AoE kena 5 monster), Hits, **APH** (rata-rata per hit), **MaxH** (hit terbesar). Nama skill dibaca otomatis dari file game. Klik kanan = kembali.
+
+### EQUIP — dari halaman breakdown
+Equip pemain lain (senjata, armor, aksesori, kostum, sayap, tunggangan, dll + refine), dibaca dari data karakter yang dikirim server waktu pemain itu masuk area pandang. Equip sendiri belum bisa (server cuma mengirimnya saat login).
+
+### Tab TARGET — damage per monster
+Daftar monster yang diserang: nama monster, DMG, D%, DPS, Hits, dan **HP penuh** (perkiraan dari sisa HP di paket damage). Klik monster = tabel DPS party **khusus monster itu** (mis. cuma damage ke boss), bisa dibuka breakdown-nya juga.
+
+### Tombol di header
+| Tombol | Fungsi |
+|---|---|
+| 👥 **Di luar party** | ON = semua pemain di sekitar ikut dihitung (badge **SEMUA** muncul). Berlaku mundur — data tetap tercatat, cuma disembunyikan |
+| ⟳ **Reset** | hapus semua data, mulai sesi baru |
+| ⏸ **Pause** | bekukan meter; waktu pause nggak ikut dihitung ke DPS |
+| ⌄ **Menu** | isi nama karakter sendiri (kalau belum ke-detect otomatis), mode **transparan**, **pilih folder game**, status capture |
+
+### Otomatis / plug & play
+- Adapter jaringan dipilih otomatis dari koneksi game (langsung, ExitLag, VPN), dicek ulang terus — meter boleh dibuka sebelum atau sesudah game.
+- Folder game dicari otomatis (registry / lokasi umum), bisa dipilih manual.
+- Nama sendiri ke-detect otomatis dari data party; kalau belum, tampil sebagai "Kamu".
+- Kalau Npcap belum terpasang, muncul petunjuk + link download.
+
+### Belum ada
+Crit rate, damage bleed/DoT (sebagian mungkin nyasar ke baris lain), tampilan boss-only otomatis, penyimpanan log/history (semua data cuma di memori — hilang kalau meter ditutup), equip sendiri.
+
 ## Pakai (user biasa)
 
 1. Install [Npcap](https://npcap.com/#download) (pilihan default).
@@ -54,7 +96,7 @@ Detail lengkap dan riwayat temuan ada di `docs/`.
 
 Pull request dan issue dipersilakan. Tolong **jangan commit file `.pcap`** (berisi data akun/karakter) atau file data game — `.gitignore` sudah menolaknya. Untuk perubahan parser, sertakan bukti dari capture (offset + contoh byte) di deskripsi PR.
 
-Area yang masih terbuka: crit rate, damage bleed/DoT, tampilan boss-only, log/history sesi.
+Area yang masih terbuka: lihat bagian **Belum ada** di atas.
 
 ## Kredit
 
