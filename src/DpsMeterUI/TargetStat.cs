@@ -14,6 +14,8 @@ public class TargetStat : INotifyPropertyChanged
     /// Nama monster dari data game; null kalau jenisnya belum ke-detect (paket
     /// entity list CC35 belum lewat sejak meter nyala).
     public string? MonsterName { get; set; }
+    /// ID jenis monster (dari CC35/CC36), buat drop list; null kalau belum ke-detect.
+    public uint? TypeId { get; set; }
     public string Name => EntityId == 0 ? "Target ?" : MonsterName ?? $"Target #{EntityId}";
     // Pembeda kalau ada beberapa monster dengan nama sama (kalau nama belum
     // ketahuan, ID-nya sudah ada di Name).

@@ -103,7 +103,8 @@ public partial class MainWindow : Window
     {
         _skillStatus = await System.Threading.Tasks.Task.Run(() =>
             $"Folder game: {GameDir.Path ?? "belum ketemu"}\n" +
-            SkillNames.LoadFromGame() + "\n" + MonsterNames.LoadFromGame() + "\n" + ItemNames.LoadFromGame());
+            SkillNames.LoadFromGame() + "\n" + MonsterNames.LoadFromGame() + "\n" + ItemNames.LoadFromGame() + "\n" +
+            MonsterDrops.LoadFromGame());
         UpdateStatusText();
     }
 
@@ -318,6 +319,7 @@ public partial class MainWindow : Window
         {
             // Nama bisa baru ke-detect belakangan (paket entity list lewat setelah hit pertama).
             t.MonsterName ??= t.EntityId != 0 ? _engine.TargetName(t.EntityId) : null;
+            t.TypeId ??= t.EntityId != 0 ? _engine.TargetType(t.EntityId) : null;
             t.PercentOfTotal = sum > 0 ? t.Damage / sum * 100.0 : 0;
             t.BarScale = top > 0 ? t.Damage / top : 0;
             t.Refresh();
@@ -497,8 +499,31 @@ public partial class MainWindow : Window
 
     void EquipView_RightClick(object sender, System.Windows.Input.MouseButtonEventArgs e) => ShowBreakdownFromEquip();
 
+    // ---- Drop list monster (tombol DROP di bar target) ----
+
+    void DropButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_scope is null) return;
+        if (DropView.Visibility == Visibility.Visible) { ShowPartyView(); return; }
+        _scope.TypeId ??= _scope.EntityId != 0 ? _engine.TargetType(_scope.EntityId) : null;
+        var drops = _scope.TypeId is uint type ? MonsterDrops.Of(type) : null;
+        DropList.ItemsSource = drops;
+        DropEmptyText.Text = _scope.TypeId is null
+            ? "Jenis monster ini belum ketahuan: server mengirimnya waktu monster masuk area pandangmu (sebelum meter nyala = tidak kebaca)."
+            : drops is null ? "Monster ini tidak ada di data drop game."
+            : "Monster ini tidak punya drop di data game.";
+        DropEmptyText.Visibility = drops is { Count: > 0 } ? Visibility.Collapsed : Visibility.Visible;
+        PartyView.Visibility = Visibility.Collapsed;
+        BreakdownView.Visibility = Visibility.Collapsed;
+        EquipView.Visibility = Visibility.Collapsed;
+        DropView.Visibility = Visibility.Visible;
+    }
+
+    void DropView_RightClick(object sender, System.Windows.Input.MouseButtonEventArgs e) => ShowPartyView();
+
     void ShowPartyView()
     {
+        DropView.Visibility = Visibility.Collapsed;
         EquipView.Visibility = Visibility.Collapsed;
         EquipView.DataContext = null;
         BreakdownView.Visibility = Visibility.Collapsed;

@@ -95,6 +95,10 @@ public class CaptureEngine
     public string? TargetName(uint entityId) =>
         _entityTypes.TryGetValue(entityId, out uint type) ? MonsterNames.Get(type) : null;
 
+    /// ID jenis monster buat entity ID target, null kalau belum ke-detect.
+    public uint? TargetType(uint entityId) =>
+        _entityTypes.TryGetValue(entityId, out uint type) ? type : null;
+
     static readonly string[] CandidateProcessNames = { "SO3DPlus", "SO3DPlus_x64" };
 
     public event Action<HitEvent>? HitDetected;

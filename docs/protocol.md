@@ -73,6 +73,7 @@ Format dari proyek open-source [unsealed](https://github.com/feryandi/unsealed):
 - `skill.edt`: 1 baris per (skill, level), 975 byte; `+0` skill ID, `+4` nama; `+259` job ID skill.
 - `monster_us.nam`: tidak di-XOR; header 52 byte, record 210 byte = ID jenis (ASCII 10 byte) + nama (200 byte).
 - Nama item: `item.edt` + `ItemString.edt` (`ItemNames.cs`).
+- Drop list (`MonsterDrops.cs`): `monster.edt` = 36 field int64 per monster; field 0 = ID jenis, field 14 = baris drop biasa, field 15 = baris drop khusus (boss/event). `drop_1/2/3.edt` = satu tabel 72 kolom dipecah 3 file (24 int32 per file, baris sejajar), isinya ID item saja. `drop_4.edt` = drop khusus (24 int32). Peluang drop tidak ada di client. `drop_5`, `quest_drop`, `Rod_Drop`, `f_drop` belum dipakai.
 
 ## Belum terpecahkan
 
